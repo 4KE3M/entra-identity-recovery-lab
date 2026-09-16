@@ -16,10 +16,6 @@ The goal was to troubleshoot the incident based on evidence rather than assuming
 
 ---
 
-<p align="center">
-  <img src="https://nextwork.ai/surprised_yellow_clever_kingfisher/uploads/6834030d-3737-424b-9e06-0206548c549c_ucjkc3ot" width="700" alt="Entra identity recovery evidence">
-</p>
-
 ## Identity Recovery Incident
 
 ### Investigating the incident
@@ -38,10 +34,6 @@ Although both failures appeared to the user as sign-in problems, the underlying 
 ### Protecting sensitive information
 
 Evidence included in this repository was sanitized before publication. Passwords, tokens, IP addresses, tenant-specific identifiers, and other sensitive information were excluded while preserving the technical evidence needed to demonstrate the troubleshooting process.
-
-<p align="center">
-  <img src="https://nextwork.ai/surprised_yellow_clever_kingfisher/uploads/6834030d-3737-424b-9e06-0206548c549c_ucjkc3ot" width="700" alt="Entra identity recovery evidence">
-</p>
 
 ## Delegating Least-Privilege Password Recovery
 
