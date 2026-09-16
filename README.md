@@ -1,93 +1,140 @@
+<img src="https://cdn.prod.website-files.com/677c400686e724409a5a7409/6790ad949cf622dc8dcd9fe4_nextwork-logo-leather.svg" alt="NextWork" width="300" />
+
 # Microsoft Entra ID Identity Recovery Lab
 
-**Skills demonstrated:** Microsoft Entra ID, identity troubleshooting, sign-in log analysis, RBAC, authentication vs. authorization, password recovery, and least-privilege administration.
+**Project Link:** [View Project](https://nextwork.ai/projects/6834030d-3737-424b-9e06-0206548c549c)
+
+**Author:** Akeem Adams
+
+**Skills demonstrated:** Microsoft Entra ID, Microsoft Graph PowerShell, identity troubleshooting, sign-in and audit log analysis, RBAC, authentication vs. authorization, password recovery, and least-privilege administration.
 
 ## Overview
 
-This lab simulates a help desk identity-recovery incident in Microsoft Entra ID. I investigated failed user sign-ins, analyzed authentication evidence, identified separate root causes, and restored access using delegated administrative permissions and least-privilege principles.
+This project simulates a help desk identity-recovery incident in Microsoft Entra ID. I investigated failed user sign-ins, analyzed authentication evidence, identified separate root causes, and restored access using delegated administrative permissions and least-privilege principles.
 
 The goal was to troubleshoot the incident based on evidence rather than assuming every reported password problem requires a password reset.
 
-## Incident Scenario
+---
 
-A user reported being unable to sign in and believed their password was the problem. The investigation required determining whether the failure was caused by invalid credentials, an account state issue, or another identity-related issue before taking corrective action.
+<p align="center">
+  <img src="https://nextwork.ai/surprised_yellow_clever_kingfisher/uploads/6834030d-3737-424b-9e06-0206548c549c_ucjkc3ot" width="700" alt="Entra identity recovery evidence">
+</p>
 
-## Incident Timeline
+## Identity Recovery Incident
 
-### Initial Sign-In Failure
-The user reported being unable to access their account. I reviewed Microsoft Entra ID sign-in evidence before making changes to the account.
+### Investigating the incident
 
-The sign-in logs returned **AADSTS50057**, indicating that the user account was disabled. Rather than resetting the password, I corrected the account state by re-enabling the user.
+I analyzed Microsoft Entra sign-in and audit evidence to determine why the user was unable to authenticate and to select the appropriate corrective action.
 
-### Second Sign-In Failure
-After the account was enabled, another failed sign-in occurred. This attempt returned **AADSTS50126**, indicating that the credentials presented during authentication were invalid.
+### Evidence-based remediation
 
-Because the account was now enabled and the sign-in evidence pointed to an authentication failure, I determined that a password reset was an appropriate corrective action.
+The investigation identified two separate authentication failures:
 
-### Delegated Administrative Access
-A help desk administrator successfully authenticated to Microsoft Entra ID but initially could not perform the password reset. This demonstrated that successful authentication does not automatically provide authorization to perform administrative actions.
+- **AADSTS50057 – User account is disabled:** I confirmed the account was disabled and re-enabled it rather than performing an unnecessary password reset.
+- **AADSTS50126 – Invalid username or password:** After confirming the account was enabled, I determined that the second failure was credential-related and performed a password reset.
 
-I assigned the administrator the **Password Administrator** role for password-recovery operations and the **Reports Reader** role for read-only access to sign-in and audit evidence.
+Although both failures appeared to the user as sign-in problems, the underlying causes required different corrective actions.
 
-### Resolution
-Using the delegated permissions, I reset the affected user's password and verified that the identity-recovery workflow could be completed without granting the administrator Global Administrator privileges.
+### Protecting sensitive information
 
-## Authentication vs. Authorization
+Evidence included in this repository was sanitized before publication. Passwords, tokens, IP addresses, tenant-specific identifiers, and other sensitive information were excluded while preserving the technical evidence needed to demonstrate the troubleshooting process.
 
-This incident demonstrated the difference between **authentication** and **authorization**.
+<p align="center">
+  <img src="https://nextwork.ai/surprised_yellow_clever_kingfisher/uploads/6834030d-3737-424b-9e06-0206548c549c_ucjkc3ot" width="700" alt="Entra identity recovery evidence">
+</p>
 
-The help desk administrator was able to successfully sign in to Microsoft Entra ID, proving that their identity had been authenticated. However, the administrator's initial attempt to reset the user's password was denied because the account did not yet have permission to perform that administrative action.
+## Delegating Least-Privilege Password Recovery
 
-**Authentication answered:** Who is this user?
+### Testing scoped helpdesk recovery access
 
-**Authorization answered:** What is this user allowed to do?
+I tested the help desk account before and after assigning delegated administrative permissions to determine the minimum access required for password recovery.
 
-Successful authentication alone was therefore not enough to perform the password reset. The appropriate administrative role had to be delegated before the recovery action could be completed.
+### Separating authentication from authorization
 
-## Root Cause Analysis
+The help desk account successfully authenticated to Microsoft Entra ID but was initially unable to reset the user's password because it lacked the required administrative permissions.
 
-### Root Cause 1: Disabled Account
+I assigned the **Password Administrator** role for password recovery and the **Reports Reader** role for read-only access to sign-in and audit evidence. This allowed the recovery workflow to be completed without granting the broader **Global Administrator** role.
 
-**Evidence:** Microsoft Entra ID sign-in logs returned `AADSTS50057`.
+<p align="center">
+  <img src="https://nextwork.ai/surprised_yellow_clever_kingfisher/uploads/6834030d-3737-424b-9e06-0206548c549c_uq6e14wz" width="450" alt="Password recovery evidence">
+</p>
 
-**Diagnosis:** The user's account was disabled. The reported "password problem" was therefore not initially a password issue.
+## Diagnosing a Disabled Account with Sign-In Evidence
 
-**Corrective Action:** Re-enabled the affected user account and tested authentication again.
+### Investigating the login failure
 
-### Root Cause 2: Invalid Credentials
+I reproduced the user's sign-in failure and reviewed Microsoft Entra sign-in logs and account properties before making any changes.
 
-**Evidence:** After the account was enabled, a subsequent sign-in attempt returned `AADSTS50126`.
+### Identifying the root cause
 
-**Diagnosis:** The credentials supplied during authentication were invalid.
+The sign-in logs returned **AADSTS50057**, indicating that the user account was disabled. I confirmed this by reviewing the account properties, where **Account enabled** was set to **No**.
 
-**Corrective Action:** Performed a password reset using appropriately delegated administrative permissions and retested access.
+The evidence showed that the account state, not the password, was causing the authentication failure. I re-enabled the account and tested authentication again rather than performing an unnecessary password reset.
 
-## Least-Privilege Administration
+<p align="center">
+  <img src="https://nextwork.ai/surprised_yellow_clever_kingfisher/uploads/6834030d-3737-424b-9e06-0206548c549c_9vh5nngl" width="700" alt="Disabled Entra ID account evidence">
+</p>
 
-Administrative access was delegated according to the principle of least privilege rather than granting broad tenant-wide administrative permissions.
+## Creating a Safe Entra Identity Lab
 
-### Password Administrator
+### Establishing test identities
 
-The **Password Administrator** role provided the help desk administrator with the password-reset capability required for routine identity-recovery tasks.
+I created fictional employee and help desk accounts with different account states to safely reproduce identity and access scenarios in the lab environment. I verified the identities using both the Microsoft Entra admin center and Microsoft Graph PowerShell.
 
-### Reports Reader
+### Authentication vs. authorization
 
-The **Reports Reader** role provided read-only access to sign-in and audit information needed to investigate authentication failures.
+**Authentication** verifies who a user is, while **authorization** determines what an authenticated user is permitted to access or do.
 
-Together, these roles provided the capabilities necessary to investigate and resolve the incident without assigning the **Global Administrator** role.
+The lab accounts were intentionally configured with different states and permissions. This allowed me to test authentication failures separately from administrative authorization and demonstrate how account state and assigned roles affect access.
 
-This reduced unnecessary administrative privilege while still allowing the help desk administrator to perform the required recovery workflow.
+<p align="center">
+  <img src="https://nextwork.ai/surprised_yellow_clever_kingfisher/uploads/6834030d-3737-424b-9e06-0206548c549c_41zcxpwa" width="700" alt="Entra ID test identities">
+</p>
 
-## 60-Second Interview Answer
+## Preparing a Secure Administration Environment
 
-**How would you troubleshoot a user who says their password doesn't work?**
+### Configuring the Entra lab and Microsoft Graph
 
-I wouldn't immediately reset the password. I'd first gather information about what the user is experiencing and review the available sign-in or authentication logs.
+I configured a dedicated Microsoft Entra ID test tenant and installed Microsoft Graph PowerShell to perform identity administration and troubleshooting from the command line.
 
-I'd look for evidence that tells me whether I'm dealing with invalid credentials, a disabled or locked account, a permissions issue, or another authentication problem.
+I authenticated to Microsoft Graph and used PowerShell alongside the Entra admin center to inspect and verify user identities and account states.
 
-For example, in this lab I encountered two sign-in failures that looked similar from the user's perspective but had different root causes. One was caused by a disabled account, while another was caused by invalid credentials.
+### Isolating administrative testing
 
-Once I identify the root cause, I'd take the appropriate corrective action, such as enabling the account or resetting the password, and then verify that the user can successfully authenticate.
+All identity changes were performed in a dedicated lab tenant isolated from production and employer environments. A bootstrap administrator account with **Global Administrator** privileges was used to configure the lab before testing delegated, least-privilege administrative access.
 
-I'd also make sure any administrative actions are performed using appropriately delegated, least-privilege permissions.
+<p align="center">
+  <img src="https://nextwork.ai/surprised_yellow_clever_kingfisher/uploads/6834030d-3737-424b-9e06-0206548c549c_eo9phxck" width="700" alt="Entra ID administration environment">
+</p>
+
+## Applying Evidence Before Password Resets
+
+### Evidence-driven identity troubleshooting
+
+A reported password problem does not necessarily mean the password is incorrect. I used Microsoft Entra sign-in logs and account-state information to identify the root cause of each authentication failure before taking corrective action.
+
+This approach prevented unnecessary password resets and demonstrated a repeatable troubleshooting process:
+
+**Review evidence → identify root cause → apply the appropriate remediation → verify access**
+
+## Skills and Lessons Learned
+
+### Tools and concepts applied
+
+This project provided hands-on experience with **Microsoft Entra ID, the Entra admin center, Microsoft Graph PowerShell, sign-in logs, audit logs, and role-based access control (RBAC)**.
+
+Key concepts demonstrated include authentication vs. authorization, least privilege, delegated administrative roles, identity troubleshooting, account-state investigation, password recovery, and evidence-based incident analysis.
+
+### Troubleshooting challenges
+
+The most challenging part of the project was locating and correlating the appropriate Entra sign-in and audit events. I had to distinguish between account-state changes, role assignments, authentication failures, and password-reset activity to determine what actually occurred during each stage of the incident.
+
+Working through those events strengthened my understanding of how **authentication, authorization, RBAC, and audit evidence** work together during identity troubleshooting.
+
+### Next steps
+
+A logical next step is automating common identity administration and troubleshooting tasks with **PowerShell and Microsoft Graph**, including account-state checks, user investigations, and repeatable recovery workflows.
+
+---
+
+*Built with [NextWork](https://nextwork.ai) - [View this project](https://nextwork.ai/projects/6834030d-3737-424b-9e06-0206548c549c)*
